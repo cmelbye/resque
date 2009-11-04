@@ -7,15 +7,11 @@ namespace :resque do
     Rake::Task['resque:setup'].invoke rescue nil
 
     worker = nil
-    queues = (ENV['QUEUES'] || ENV['QUEUE']).to_s.split(',')
+    queues = (ENV['QUEUES'] || ENV['QUEUE'] || "default").to_s.split(',')
 
-    begin
-      worker = Resque::Worker.new(*queues)
-      worker.verbose = ENV['LOGGING'] || ENV['VERBOSE']
-      worker.very_verbose = ENV['VVERBOSE']
-    rescue Resque::NoQueueError
-      abort "set QUEUE env var, e.g. $ QUEUE=critical,high rake resque:work"
-    end
+    worker = Resque::Worker.new(*queues)
+    worker.verbose = ENV['LOGGING'] || ENV['VERBOSE']
+    worker.very_verbose = ENV['VVERBOSE']
 
     puts "*** Starting worker #{worker}"
 
